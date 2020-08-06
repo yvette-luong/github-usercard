@@ -1,8 +1,22 @@
+import axios from 'axios';
+
 /*
+
   STEP 1: using axios, send a GET request to the following URL
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
+const parentContainerCards = document.querySelector('.cards') //container card - step4
+
+const myUserName = 'yvette-luong'
+axios.get(`https://api.github.com/users/${myUserName}`)
+.then(res => {
+  parentContainerCards.appendChild(componentMaker(res))
+  console.log(res)
+})
+.catch(err => {
+  console.log(err)
+})
 
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
@@ -28,7 +42,18 @@
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+
+const followersArray = ['tetondan','dustinmyers','justsml','luishrd','bigknell'];
+followersArray.forEach(follower => {
+  axios
+  .get(`http://api.github.com/users/${follower}`)
+  .then(res =>{
+    parentContainerCards.appendChild(componentMaker(res))
+  })
+  .catch(err=>{
+    console.log(err)
+  })
+})
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -58,3 +83,51 @@ const followersArray = [];
     luishrd
     bigknell
 */
+const componentMaker = (object) => {
+
+  //Element creator
+  const outerWrapper  = document.createElement('div');
+  const innerWrapper  = document.createElement('div');
+  const profilePic    = document.createElement('img');
+  const subtitle      = document.createElement('h3');
+  const paraUsername  = document.createElement('p');
+  const paraLocation  = document.createElement('p');
+  const paraProfile   = document.createElement('p');
+  const paraFollowers = document.createElement('p');
+  const paraFollowing = document.createElement('p');
+  const paraBio       = document.createElement('p');
+  const githubLink    = document.createElement('a');
+
+  //ClassList att setup
+  outerWrapper.classList.add('card');
+  profilePic.setAttribute('src',object.data['avatar_url']);
+  innerWrapper.classList.add('card-info');
+  subtitle.classList.add('name')
+  paraUsername.classList.add('username');
+  githubLink.setAttribute('href',object.data['html_url'])
+
+  //Text
+  subtitle.textContent      = object.data.name;
+  paraUsername.textContent  = object.data.login
+  paraLocation.textContent  = `Location: ${object.data.location}`;
+  paraProfile.textContent   = "Profile: "
+  githubLink.textContent    = 'Link to Github'
+  paraFollowers.textContent = `Followers : ${object.data.followers}`;
+  paraFollowing.textContent = `Following: ${object.data.following}`;
+  paraBio.textContent       = `Bio: ${object.data.bio}`;
+
+  //creating structure
+  outerWrapper.appendChild(profilePic);
+  outerWrapper.appendChild(innerWrapper);
+  innerWrapper.appendChild(subtitle);
+  innerWrapper.appendChild(paraUsername);
+  innerWrapper.appendChild(paraLocation);
+  innerWrapper.appendChild(paraProfile);
+  innerWrapper.appendChild(paraFollowers);
+  innerWrapper.appendChild(paraFollowing);
+  innerWrapper.appendChild(paraBio);
+  paraProfile.appendChild(githubLink);
+
+  return outerWrapper;
+}
+
